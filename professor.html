@@ -1,0 +1,239 @@
+<!--
+  professor.html — Tela do professor (mesmo conteúdo do index.html
+  na parte de navegação, mas com os formulários de verdade).
+  Duas abas: "Equipamentos" (Chromebook/Positivo) e "Salas"
+  (Biblioteca/Sala do Acessa). Lógica em js/professor.js.
+-->
+  
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendar equipamento — Sala do Acessa</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="page-header">
+      <h1>Controle de Equipamentos</h1>
+      <p>Sala do Acessa</p>
+    </div>
+
+    <nav class="pill-tabs">
+      <a href="index.html" class="pill-tab">Início</a>
+      <a href="professor.html" class="pill-tab active">Sou professor(a)</a>
+    </nav>
+
+    <nav class="pill-tabs">
+      <button class="pill-tab tab-btn active" data-tab="equipamentos">Equipamentos</button>
+      <button class="pill-tab tab-btn" data-tab="salas">Salas</button>
+    </nav>
+
+    <!-- Aba: Equipamentos — disponibilidade, novo agendamento e próximos agendamentos -->
+    <div class="tab-panel active" data-tab-panel="equipamentos">
+
+      <div class="panel">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square"
+            viewBox="0 0 16 16">
+            <path
+              d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
+            <path
+              d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" />
+          </svg>
+          Disponibilidade agora
+        </h2>
+        <p class="panel-sub">Quantidade livre neste momento, sem contar o que já está reservado para outras turmas.</p>
+        <div class="grid-2col-inv" id="inv-cards">
+          <div class="inv-card">
+            <div class="label">Chromebook</div>
+            <div class="value" id="inv-chromebook">-- <small>/ --</small></div>
+          </div>
+          <div class="inv-card">
+            <div class="label">Positivo</div>
+            <div class="value" id="inv-positivo">-- <small>/ --</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-calendar4-week" viewBox="0 0 16 16">
+            <path
+              d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z" />
+            <path
+              d="M11 7.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-2 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z" />
+          </svg>
+          Novo agendamento
+        </h2>
+        <p class="panel-sub">Faça uma reserva para utilizar equipamentos.</p>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Seu nome</label>
+            <select id="f-professor">
+              <option value="">Selecione seu nome...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Tipo de equipamento</label>
+            <div class="choice-row" id="f-tipo">
+              <div class="choice-btn" data-val="chromebook">Chromebook</div>
+              <div class="choice-btn" data-val="positivo">Positivo</div>
+            </div>
+          </div>
+        </div>
+        <p class="panel-sub" id="sem-professores" style="margin-top:-8px;">
+          Nenhum professor cadastrado ainda. Peça ao administrador para te adicionar na tela de administração.
+        </p>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Quantidade</label>
+            <input type="number" id="f-quantidade" min="1" placeholder="Ex: 20">
+          </div>
+          <div class="field">
+            <label>Data de uso</label>
+            <input type="date" id="f-data">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Período</label>
+          <div class="choice-row" id="f-periodo">
+            <div class="choice-btn" data-val="manha">PEI Manhã</div>
+            <div class="choice-btn" data-val="tarde">PEI Tarde</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Série/Turma</label>
+          <select id="f-serie" disabled>
+            <option value="">Selecione o período primeiro...</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Aulas (marque uma ou mais)</label>
+          <div class="choice-row" id="f-aula">
+            <div class="choice-btn" data-val="1">1ª</div>
+            <div class="choice-btn" data-val="2">2ª</div>
+            <div class="choice-btn" data-val="3">3ª</div>
+            <div class="choice-btn" data-val="4">4ª</div>
+            <div class="choice-btn" data-val="5">5ª</div>
+            <div class="choice-btn" data-val="6">6ª</div>
+            <div class="choice-btn" data-val="7">7ª</div>
+          </div>
+        </div>
+
+        <p class="panel-sub hidden" id="preview-disponibilidade" style="margin-top:-8px;"></p>
+
+        <button class="btn btn-cyan" id="btn-agendar">Agendar</button>
+      </div>
+
+      <div class="panel">
+        <h2>Próximos agendamentos</h2>
+        <div id="lista-agendamentos">
+          <div class="empty-state neutral">Carregando...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Aba: Salas — reservar Biblioteca/Sala do Acessa e ver próximas reservas -->
+    <div class="tab-panel" data-tab-panel="salas">
+
+      <div class="panel">
+        <h2><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-calendar4-week" viewBox="0 0 16 16">
+            <path
+              d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z" />
+            <path
+              d="M11 7.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-2 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z" />
+          </svg>
+          Reservar Biblioteca ou Sala do Acessa</h2>
+        <p class="panel-sub">Cada sala só pode ter uma turma por vez no mesmo dia, período e aula.</p>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Seu nome</label>
+            <select id="s-professor">
+              <option value="">Selecione seu nome...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sala</label>
+            <div class="choice-row" id="s-sala">
+              <div class="choice-btn" data-val="biblioteca">Biblioteca</div>
+              <div class="choice-btn" data-val="acessa">Sala do Acessa</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Data de uso</label>
+          <input type="date" id="s-data">
+        </div>
+
+        <div class="field">
+          <label>Período</label>
+          <div class="choice-row" id="s-periodo">
+            <div class="choice-btn" data-val="manha">PEI Manhã</div>
+            <div class="choice-btn" data-val="tarde">PEI Tarde</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Série/Turma</label>
+          <select id="s-serie" disabled>
+            <option value="">Selecione o período primeiro...</option>
+          </select>
+          <p class="panel-sub" style="margin-top:8px;">
+            Use "Sem série específica" se for usar a sala mais de uma vez no dia ou não tiver uma turma fixa — combine
+            antes com o PROATI.
+          </p>
+        </div>
+
+        <div class="field">
+          <label>Aulas (marque uma ou mais)</label>
+          <div class="choice-row" id="s-aula">
+            <div class="choice-btn" data-val="1">1ª</div>
+            <div class="choice-btn" data-val="2">2ª</div>
+            <div class="choice-btn" data-val="3">3ª</div>
+            <div class="choice-btn" data-val="4">4ª</div>
+            <div class="choice-btn" data-val="5">5ª</div>
+            <div class="choice-btn" data-val="6">6ª</div>
+            <div class="choice-btn" data-val="7">7ª</div>
+          </div>
+        </div>
+
+        <p class="panel-sub hidden" id="preview-sala" style="margin-top:-8px;"></p>
+
+        <button class="btn btn-cyan" id="btn-reservar-sala">Reservar</button>
+      </div>
+
+      <div class="panel">
+        <h2>Próximas reservas de sala</h2>
+        <div id="lista-reservas-salas">
+          <div class="empty-state neutral">Carregando...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/professor.js"></script>
+  <script src="js/transicoes.js"></script>
+</body>
+
+</html>

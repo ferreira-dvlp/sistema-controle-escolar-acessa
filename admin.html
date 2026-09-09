@@ -1,0 +1,243 @@
+<!--
+  admin.html — Painel de administração (protegido por senha)
+  4 abas: Inventário, Registro (manual + agendamentos pendentes +
+  retiradas ativas), Salas (reservas pendentes/confirmadas) e
+  Histórico. Lógica em js/admin.js — a senha fica em js/admin-auth.js.
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administração — Controle de Equipamentos</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="page-header">
+      <h1>Controle de Equipamentos</h1>
+      <p>Sala do Acessa — Administração</p>
+    </div>
+
+    <nav class="pill-tabs">
+      <a href="index.html" class="pill-tab">Início</a>
+      <a href="admin.html" class="pill-tab active">Administração</a>
+    </nav>
+
+    <div id="tela-login" class="lock-screen">
+      <div class="lock-box">
+        <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-lock" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3" />
+          </svg></div>
+        <h2>Área restrita</h2>
+        <p>Digite a senha de administração para continuar.</p>
+        <input type="password" id="input-senha" placeholder="Digite a senha">
+        <button class="btn btn-cyan" id="btn-entrar">Entrar</button>
+      </div>
+    </div>
+
+    <div id="conteudo-admin" class="hidden">
+
+      <nav class="pill-tabs">
+        <button class="pill-tab tab-btn active" data-tab="inventario">Inventário</button>
+        <button class="pill-tab tab-btn" data-tab="registro">Registro</button>
+        <button class="pill-tab tab-btn" data-tab="salas">Salas</button>
+        <button class="pill-tab tab-btn" data-tab="historico">Histórico</button>
+      </nav>
+
+      <!-- Aba: Inventário — estoque total, edição de quantidade e lista de professores -->
+      <div class="tab-panel active" data-tab-panel="inventario">
+
+        <div class="panel">
+          <h2>Resumo</h2>
+          <div class="grid-3">
+            <div class="inv-card">
+              <div class="label">Em uso agora</div>
+              <div class="value" id="st-em-uso">--</div>
+            </div>
+            <div class="inv-card">
+              <div class="label">Agendamentos pendentes</div>
+              <div class="value" id="st-pendentes">--</div>
+            </div>
+            <div class="inv-card">
+              <div class="label">Devoluções hoje</div>
+              <div class="value" id="st-devolucoes-hoje">--</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Inventário</h2>
+          <p class="panel-sub">Ajuste aqui a quantidade total de cada equipamento que a escola possui.</p>
+          <div class="grid-2col-inv">
+            <div class="inv-card">
+              <div class="label">Chromebook</div>
+              <div class="value" id="inv-chromebook">-- <small>/ --</small></div>
+              <div class="edit-row">
+                <input type="number" id="edit-chromebook" min="0" style="text-align:center;">
+                <button class="btn btn-outline" style="width:auto; padding:8px 12px;"
+                  data-tipo="chromebook">Salvar</button>
+              </div>
+            </div>
+            <div class="inv-card">
+              <div class="label">Positivo</div>
+              <div class="value" id="inv-positivo">-- <small>/ --</small></div>
+              <div class="edit-row">
+                <input type="number" id="edit-positivo" min="0" style="text-align:center;">
+                <button class="btn btn-outline" style="width:auto; padding:8px 12px;"
+                  data-tipo="positivo">Salvar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Professores cadastrados</h2>
+          <p class="panel-sub">Só quem estiver nesta lista aparece para escolha na tela de agendamento.</p>
+          <div class="field" style="display:flex; gap:8px;">
+            <input type="text" id="novo-professor" placeholder="Nome completo do professor">
+            <button class="btn btn-outline" id="btn-add-professor"
+              style="width:auto; padding:10px 16px;">Adicionar</button>
+          </div>
+          <div id="lista-professores"></div>
+        </div>
+
+      </div>
+
+      <!-- Aba: Registro — retirada/devolução manual, agendamentos pendentes e retiradas ativas -->
+      <div class="tab-panel" data-tab-panel="registro">
+
+        <div class="panel">
+          <h2>Novo registro manual</h2>
+          <p class="panel-sub">Use aqui quando o equipamento sai ou volta fisicamente da sala, sem passar por
+            agendamento prévio.</p>
+
+          <div class="field">
+            <label>Tipo de equipamento</label>
+            <div class="choice-row" id="r-tipo">
+              <div class="choice-btn" data-val="chromebook">Chromebook</div>
+              <div class="choice-btn" data-val="positivo">Positivo</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label>Quantidade</label>
+              <input type="number" id="r-quantidade" min="1" placeholder="Ex: 20">
+            </div>
+            <div class="field">
+              <label>Professor responsável</label>
+              <select id="r-professor">
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Período</label>
+            <div class="choice-row" id="r-periodo">
+              <div class="choice-btn" data-val="manha">PEI Manhã</div>
+              <div class="choice-btn" data-val="tarde">PEI Tarde</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Série/Turma (opcional)</label>
+            <select id="r-serie" disabled>
+              <option value="">Selecione o período primeiro...</option>
+            </select>
+            <p class="panel-sub" style="margin-top:8px;">
+              "Sem série específica" é para registros que não têm uma turma fixa (ex: uso avulso da sala).
+            </p>
+          </div>
+
+          <div class="field">
+            <label>Aulas (marque uma ou mais)</label>
+            <div class="choice-row" id="r-aula">
+              <div class="choice-btn" data-val="1">1ª</div>
+              <div class="choice-btn" data-val="2">2ª</div>
+              <div class="choice-btn" data-val="3">3ª</div>
+              <div class="choice-btn" data-val="4">4ª</div>
+              <div class="choice-btn" data-val="5">5ª</div>
+              <div class="choice-btn" data-val="6">6ª</div>
+              <div class="choice-btn" data-val="7">7ª</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Números dos notebooks utilizados (opcional)</label>
+            <input type="text" id="r-numeros" placeholder="Ex: 15 a 55, ou 3, 7, 12">
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-green" id="btn-retirada">Registrar retirada</button>
+            <button class="btn btn-blue-fill" id="btn-devolucao">Registrar devolução</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Agendamentos pendentes</h2>
+          <p class="panel-sub">Feitos pelos professores. Confirme a retirada quando o equipamento sair de fato da sala.
+          </p>
+          <div id="lista-pendentes">
+            <div class="empty-state neutral">Carregando...</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Retiradas ativas (aguardando devolução)</h2>
+          <div id="lista-ativas">
+            <div class="empty-state neutral">Carregando...</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Aba: Salas — reservas de sala pendentes e confirmadas -->
+      <div class="tab-panel" data-tab-panel="salas">
+
+        <div class="panel">
+          <h2>Reservas de sala pendentes</h2>
+          <p class="panel-sub">Confirme para liberar o horário, ou cancele se não for possível atender.</p>
+          <div id="lista-salas-pendentes">
+            <div class="empty-state neutral">Carregando...</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Reservas confirmadas</h2>
+          <div id="lista-salas-confirmadas">
+            <div class="empty-state neutral">Carregando...</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Aba: Histórico — últimas devoluções e cancelamentos -->
+      <div class="tab-panel" data-tab-panel="historico">
+        <div class="panel">
+          <h2>Histórico recente</h2>
+          <div id="lista-historico">
+            <div class="empty-state neutral">Carregando...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/admin-auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/transicoes.js"></script>
+</body>
+
+</html>
